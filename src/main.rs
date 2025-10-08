@@ -1,7 +1,7 @@
 mod testing_data;
 mod training_data;
 
-use crate::{testing_data::TrainingData, training_data::TestingData};
+use crate::{testing_data::TestingData, training_data::TrainingData};
 
 fn main() -> anyhow::Result<()> {
     let training_data = TrainingData::try_new()?;
