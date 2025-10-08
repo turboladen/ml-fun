@@ -5,4 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-polars = { version = "0.51.0", features = ["lazy"] }
+linfa = "0.8.0"
+linfa-ensemble = "0.8.0"
+linfa-trees = "0.8.0"
+polars = { version = "0.51.0", features = ["lazy", "to_dummies"] }
