@@ -1,14 +1,9 @@
-[package]
-name = "titanic-ml"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "3"
+members = ["titanic"]
 
-[dependencies]
+[workspace.dependencies]
 anyhow = "1.0.100"
 linfa = "0.8.0"
-linfa-ensemble = "0.8.0"
-linfa-trees = "0.8.0"
 ndarray = "0.16"
-polars = { version = "0.51.0", features = ["lazy", "to_dummies"] }
-rand = "0.8"
-rand_xoshiro = "0.6"
+polars = { version = "0.51.0" }
