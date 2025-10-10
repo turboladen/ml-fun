@@ -1,4 +1,6 @@
-use polars::prelude::*;
+use polars::prelude::{LazyCsvReader, LazyFileListReader, LazyFrame, PlPath};
+
+use crate::data::Data;
 
 pub struct TestingData {
     lazy_frame: LazyFrame,
@@ -12,18 +14,10 @@ impl TestingData {
 
         Ok(Self { lazy_frame })
     }
+}
 
-    pub fn lazy_frame_cloned(&self) -> LazyFrame {
+impl Data for TestingData {
+    fn lazy_frame_cloned(&self) -> polars::prelude::LazyFrame {
         self.lazy_frame.clone()
-    }
-
-    pub fn get_big_x(&self) -> anyhow::Result<DataFrame> {
-        let big_x = self
-            .lazy_frame
-            .clone()
-            .select([col("Pclass"), col("Sex"), col("SibSp"), col("Parch")])
-            .collect()?;
-
-        Ok(big_x.to_dummies(None, false, false)?)
     }
 }
