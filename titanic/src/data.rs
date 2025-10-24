@@ -12,7 +12,7 @@ pub trait Data {
         Ok(df.column(col_name)?.clone().as_series().unwrap().clone())
     }
 
-    fn get_big_x<E>(&self, exprs: E) -> anyhow::Result<DataFrame>
+    fn get_feature_matrix<E>(&self, exprs: E) -> anyhow::Result<DataFrame>
     where
         E: AsRef<[Expr]>,
     {

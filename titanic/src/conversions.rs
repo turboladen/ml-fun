@@ -5,7 +5,7 @@
 //! and linfa for machine learning.
 
 use anyhow::Result;
-use ndarray::{Array1, Array2};
+use ndarray::{Array1, Array2, s};
 use polars::prelude::*;
 
 /// Convert a Polars DataFrame to an ndarray Array2<f64>
@@ -155,6 +155,53 @@ pub fn write_csv_file(df: &mut DataFrame, path: &str) -> Result<()> {
     Ok(())
 }
 
+/// Calculate accuracy given predictions and actual labels
+pub fn calculate_accuracy(predictions: &Array1<usize>, actual: &Array1<usize>) -> f64 {
+    let correct = predictions
+        .iter()
+        .zip(actual.iter())
+        .filter(|(pred, act)| pred == act)
+        .count();
+    correct as f64 / actual.len() as f64
+}
+
+/// Split arrays into training and validation sets
+///
+/// This function splits feature and target arrays into training and validation sets
+/// based on the provided ratio. The split is sequential (not shuffled).
+///
+/// # Arguments
+/// * `x` - Feature matrix (rows = samples, columns = features)
+/// * `y` - Target vector (class labels)
+/// * `ratio` - Proportion for training set (e.g., 0.8 = 80% train, 20% validation)
+///
+/// # Returns
+/// * Tuple of (x_train, x_val, y_train, y_val)
+///
+/// # Example
+/// ```ignore
+/// let (x_train, x_val, y_train, y_val) = train_test_split(x, y, 0.8);
+/// println!("Training samples: {}, Validation samples: {}", x_train.nrows(), x_val.nrows());
+/// ```
+pub fn train_test_split(
+    x: Array2<f64>,
+    y: Array1<usize>,
+    ratio: f32,
+) -> (Array2<f64>, Array2<f64>, Array1<usize>, Array1<usize>) {
+    let n_samples = x.nrows();
+    let split_idx = (n_samples as f32 * ratio) as usize;
+
+    // Split features
+    let x_train = x.slice(s![..split_idx, ..]).to_owned();
+    let x_val = x.slice(s![split_idx.., ..]).to_owned();
+
+    // Split targets
+    let y_train = y.slice(s![..split_idx]).to_owned();
+    let y_val = y.slice(s![split_idx..]).to_owned();
+
+    (x_train, x_val, y_train, y_val)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -192,5 +239,27 @@ mod tests {
         assert_eq!(array[0], 1);
         assert_eq!(array[1], 0); // null becomes 0
         assert_eq!(array[2], 0);
+    }
+
+    #[test]
+    fn test_train_test_split() {
+        use ndarray::{arr1, arr2};
+
+        let x = arr2(&[[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0], [9.0, 10.0]]);
+        let y = arr1(&[0, 1, 0, 1, 0]);
+
+        let (x_train, x_val, y_train, y_val) = train_test_split(x, y, 0.8);
+
+        // With 5 samples and 0.8 ratio, we should get 4 training and 1 validation
+        assert_eq!(x_train.nrows(), 4);
+        assert_eq!(x_val.nrows(), 1);
+        assert_eq!(y_train.len(), 4);
+        assert_eq!(y_val.len(), 1);
+
+        // Check that the split happened correctly
+        assert_eq!(x_train[[0, 0]], 1.0);
+        assert_eq!(x_val[[0, 0]], 9.0);
+        assert_eq!(y_train[0], 0);
+        assert_eq!(y_val[0], 0);
     }
 }

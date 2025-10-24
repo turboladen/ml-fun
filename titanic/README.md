@@ -18,3 +18,9 @@ Port the Kaggle Titanic Tutorial from Python (pandas + scikit-learn) to Rust usi
 - [ ] Better missing value imputation
 - [ ] Hyperparameter tuning
 - [ ] Add more ML models (Gradient Boosting, etc.)
+
+## Iterations on Predictions
+
+1. `0.1.0` submission: 0.76555
+2. `0.2.0` submission: 0.7837
+   - Added `test_train_split`
