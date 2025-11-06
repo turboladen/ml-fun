@@ -8,7 +8,6 @@ use crate::{
     conversions::*, data::Data, random_forest::RandomForestClassifier, testing_data::TestingData,
     training_data::TrainingData,
 };
-use ndarray::{ArrayBase, s};
 use polars::prelude::col;
 
 fn main() -> anyhow::Result<()> {
@@ -54,6 +53,8 @@ fn main() -> anyhow::Result<()> {
     let x_full_df = training_data.get_feature_matrix([
         col("Pclass"),
         col("Sex"),
+        col("Age"),
+        col("Fare"),
         col("SibSp"),
         col("Parch"),
     ])?;
@@ -82,6 +83,8 @@ fn main() -> anyhow::Result<()> {
         let x_test_df = testing_data.get_feature_matrix([
             col("Pclass"),
             col("Sex"),
+            col("Age"),
+            col("Fare"),
             col("SibSp"),
             col("Parch"),
         ])?;
@@ -131,15 +134,15 @@ fn prepare_for_test_train_split(
 )> {
     // Get features (X) and labels (y) for training
     println!("\n=== Preparing Training Data ===");
-    let x = {
-        let x_df = training_data.get_feature_matrix([
-            col("Pclass"),
-            col("Sex"),
-            col("SibSp"),
-            col("Parch"),
-        ])?;
-        dataframe_to_array2(&x_df)?
-    };
+    let x_df = training_data.get_feature_matrix([
+        col("Pclass"),
+        col("Sex"),
+        col("Age"),
+        col("Fare"),
+        col("SibSp"),
+        col("Parch"),
+    ])?;
+    let x = dataframe_to_array2(&x_df)?;
     println!("Full dataset features shape: {:?}", x.dim());
 
     let y = {
